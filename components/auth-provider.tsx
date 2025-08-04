@@ -4,10 +4,14 @@ import type React from "react"
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { apiRequest } from "@/lib/api" // Import apiRequest
 
 interface User {
   username: string
-  authorities: string
+  name: string // Add name field
+  mobileNumber?: string // Add mobileNumber field
+  email?: string // Add email field
+  authorities: string[] // Changed to string array
 }
 
 interface AuthContextType {
@@ -24,24 +28,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
+  const fetchUserDetails = async (username: string) => {
+    try {
+      const response = await apiRequest(`/auth/me?username=${username}`)
+      const userData = await response.json()
+      return userData as Omit<User, "authorities"> // Return user data without authorities
+    } catch (error) {
+      console.error("Failed to fetch user details:", error)
+      return null
+    }
+  }
+
   useEffect(() => {
-    const token = localStorage.getItem("jwt-token")
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]))
-        if (payload.exp * 1000 > Date.now()) {
-          setUser({
-            username: payload.username,
-            authorities: payload.authorities,
-          })
-        } else {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem("jwt-token")
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]))
+          if (payload.exp * 1000 > Date.now()) {
+            const userDetails = await fetchUserDetails(payload.username)
+            if (userDetails) {
+              setUser({
+                username: payload.username,
+                name: userDetails.name,
+                mobileNumber: userDetails.mobileNumber,
+                email: userDetails.email,
+                // Parse authorities string into an array
+                authorities: payload.authorities ? payload.authorities.split(",") : [],
+              })
+            } else {
+              localStorage.removeItem("jwt-token")
+            }
+          } else {
+            localStorage.removeItem("jwt-token")
+          }
+        } catch (error) {
           localStorage.removeItem("jwt-token")
         }
-      } catch (error) {
-        localStorage.removeItem("jwt-token")
       }
+      setIsLoading(false)
     }
-    setIsLoading(false)
+    initializeAuth()
   }, [])
 
   const login = async (username: string, password: string): Promise<boolean> => {
@@ -62,11 +89,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.status === "OK" && data.jwtToken) {
           localStorage.setItem("jwt-token", data.jwtToken)
           const payload = JSON.parse(atob(data.jwtToken.split(".")[1]))
-          setUser({
-            username: payload.username,
-            authorities: payload.authorities,
-          })
-          return true
+
+          const userDetails = await fetchUserDetails(payload.username)
+          if (userDetails) {
+            setUser({
+              username: payload.username,
+              name: userDetails.name,
+              mobileNumber: userDetails.mobileNumber,
+              email: userDetails.email,
+              // Parse authorities string into an array
+              authorities: payload.authorities ? payload.authorities.split(",") : [],
+            })
+            return true
+          } else {
+            localStorage.removeItem("jwt-token") // Clear token if user details can't be fetched
+            return false
+          }
         }
       } else {
         console.error("Login failed with status:", response.status)

@@ -51,7 +51,7 @@ export function ConnectionStatus() {
           disabled={isChecking}
           className="mr-2 bg-transparent"
         >
-          {isChecking ? <RefreshCw className="h-4 w-4 animate-spin" /> : "إعادة المحاولة"}
+          {isChecking ? <RefreshCw className="h-4 w-4 animate-spin" /> : "إعادة المحاو��ة"}
         </Button>
       </AlertDescription>
     </Alert>

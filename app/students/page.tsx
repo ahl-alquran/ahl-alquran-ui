@@ -40,8 +40,14 @@ import {
 } from "@/lib/api"
 import { Search, UserPlus, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useCities } from "@/hooks/use-cities"
+import { useLevels } from "@/hooks/use-levels" // Import the new useLevels hook
+import { API_BASE_URL } from "@/lib/api"
 
 export default function StudentsPage() {
+  const { cities, loading: citiesLoading, error: citiesError, refetch: refetchCities } = useCities(API_BASE_URL)
+  const { levels, loading: levelsLoading, error: levelsError, refetch: refetchLevels } = useLevels(API_BASE_URL) // Use the new useLevels hook
+
   const [students, setStudents] = useState<Student[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedYear, setSelectedYear] = useState<string>("1446")
@@ -75,23 +81,22 @@ export default function StudentsPage() {
   })
 
   const pageSize = 10
-  const currentYear = new Date().getFullYear();
-  const hijriYear = currentYear - 578;
-  const years = Array.from({ length: 5 }, (_, i) => hijriYear - i);
+  const currentYear = new Date().getFullYear()
+  const hijriYear = currentYear - 578
+  const years = Array.from({ length: 5 }, (_, i) => hijriYear - i)
 
-  const levels = [
-    "المستوى الأول القرآن الكريم كاملاً",
-    "المستوى الثاني عشرون جزءً",
-    "المستوى الثالث نصف القرآن الكريم",
-    "المستوى الرابع ثمانية أجزاء",
-    "المستوى الخامس ربع القرآن الكريم",
-    "المستوى السادس خمسة أجزاء",
-    "المستوى السابع ثلاثة أجزاء",
-    "المستوى الثامن جزءان",
-    "المستوى التاسع جزء واحد",
-  ]
-
-  const cities = ["بني بخيت", "عمر باشا", "المنيا", "أسيوط", "سوهاج"]
+  // Remove the static `levels` array:
+  //- const levels = [
+  //-   "المستوى الأول القرآن الكريم كاملاً",
+  //-   "المستوى الثاني عشرون جزءً",
+  //-   "المستوى الثالث نصف القرآن الكريم",
+  //-   "المستوى الرابع ثمانية أجزاء",
+  //-   "المستوى الخامس ربع القرآن الكريم",
+  //-   "المستوى السادس خمسة أجزاء",
+  //-   "المستوى السابع ثلاثة أجزاء",
+  //-   "المستوى الثامن جزءان",
+  //-   "المستوى التاسع جزء واحد",
+  //- ]
 
   useEffect(() => {
     fetchStudents()
@@ -278,13 +283,17 @@ export default function StudentsPage() {
                     value={registerForm.city}
                     onValueChange={(value) => setRegisterForm({ ...registerForm, city: value })}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر المدينة" />
+                    <SelectTrigger disabled={citiesLoading || !!citiesError}>
+                      <SelectValue
+                        placeholder={
+                          citiesLoading ? "جاري تحميل المدن..." : citiesError ? "خطأ في تحميل المدن" : "اختر المدينة"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {cities.map((city) => (
-                        <SelectItem key={city} value={city}>
-                          {city}
+                        <SelectItem key={city.name} value={city.name}>
+                          {city.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -296,13 +305,21 @@ export default function StudentsPage() {
                     value={registerForm.level}
                     onValueChange={(value) => setRegisterForm({ ...registerForm, level: value })}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر المستوى" />
+                    <SelectTrigger disabled={levelsLoading || !!levelsError}>
+                      <SelectValue
+                        placeholder={
+                          levelsLoading
+                            ? "جاري تحميل المستويات..."
+                            : levelsError
+                              ? "خطأ في تحميل المستويات"
+                              : "اختر المستوى"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {levels.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
+                        <SelectItem key={level.name} value={level.name}>
+                          {level.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -363,13 +380,17 @@ export default function StudentsPage() {
               <div className="space-y-2">
                 <Label htmlFor="edit-city">المدينة</Label>
                 <Select value={editForm.city} onValueChange={(value) => setEditForm({ ...editForm, city: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر المدينة" />
+                  <SelectTrigger disabled={citiesLoading || !!citiesError}>
+                    <SelectValue
+                      placeholder={
+                        citiesLoading ? "جاري تحميل المدن..." : citiesError ? "خطأ في تحميل المدن" : "اختر المدينة"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {cities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
+                      <SelectItem key={city.name} value={city.name}>
+                        {city.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -378,13 +399,21 @@ export default function StudentsPage() {
               <div className="space-y-2">
                 <Label htmlFor="edit-level">المستوى</Label>
                 <Select value={editForm.level} onValueChange={(value) => setEditForm({ ...editForm, level: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر المستوى" />
+                  <SelectTrigger disabled={levelsLoading || !!levelsError}>
+                    <SelectValue
+                      placeholder={
+                        levelsLoading
+                          ? "جاري تحميل المستويات..."
+                          : levelsError
+                            ? "خطأ في تحميل المستويات"
+                            : "اختر المستوى"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {levels.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
+                      <SelectItem key={level.name} value={level.name}>
+                        {level.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -489,7 +518,7 @@ export default function StudentsPage() {
                         <p className="text-sm text-gray-700">{student.level}</p>
                       </div>
                       <div className="flex items-center space-x-2 space-x-reverse">
-                        <Badge className={getResultBadgeColor(student.result)}>{student.result}%</Badge>
+                        <Badge className={getResultBadgeColor(student.result)}>{student.result}</Badge>
                         <Button
                           variant="outline"
                           size="sm"

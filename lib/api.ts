@@ -1,4 +1,5 @@
-export const API_BASE_URL = "http://localhost:8080"
+// This file is included to ensure API_BASE_URL and apiRequest are available for useCities.
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const token = localStorage.getItem("jwt-token")
@@ -92,6 +93,43 @@ export interface UpdateStudentRequest {
   year: number
 }
 
+// New interfaces for User Management
+export interface User {
+  name: string
+  username: string
+  mobileNumber: string // Matches the /user/list response
+  email: string
+  authorities: string[] // Already an array from auth-provider
+}
+
+export interface RegisterUserRequest {
+  name: string
+  email: string
+  mobile: string // Matches the /user/add request body
+  username: string
+  password: string
+  role: "ADMIN" | "USER" // Specific roles
+}
+
+// New API functions for User Management
+export async function fetchUsers(): Promise<User[]> {
+  const response = await apiRequest("/user/list")
+  return await response.json()
+}
+
+export async function addUser(user: RegisterUserRequest): Promise<void> {
+  await apiRequest("/user/add", {
+    method: "POST",
+    body: JSON.stringify(user),
+  })
+}
+
+export async function deleteUser(username: string): Promise<void> {
+  await apiRequest(`/user/delete?username=${username}`, {
+    method: "DELETE",
+  })
+}
+
 // Delete student
 export async function deleteStudent(studentCode: number): Promise<string> {
   const response = await apiRequest(`/student?code=${studentCode}`, {
@@ -106,4 +144,16 @@ export async function updateStudent(student: UpdateStudentRequest): Promise<void
     method: "POST",
     body: JSON.stringify(student),
   })
+}
+
+// New interface for student count by level
+export interface LevelStudentCount {
+  levelName: string
+  studentCount: number
+}
+
+// New API function to fetch student count by level
+export async function fetchStudentCountByLevel(year: number): Promise<LevelStudentCount[]> {
+  const response = await apiRequest(`/report/count/student-by-level/${year}`)
+  return await response.json()
 }
