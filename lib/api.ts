@@ -157,3 +157,67 @@ export async function fetchStudentCountByLevel(year: number): Promise<LevelStude
   const response = await apiRequest(`/report/count/student-by-level/${year}`)
   return await response.json()
 }
+
+// New API function to download Excel report for a specific level
+export async function downloadExcelReport(level: string, year: number): Promise<Blob> {
+  const encodedLevel = encodeURIComponent(level)
+  const response = await apiRequest(`/report/excel?level=${encodedLevel}&year=${year}`)
+  return await response.blob()
+}
+
+// New API function to download Excel report for all students in a year
+export async function downloadAllStudentsExcelReport(year: number): Promise<Blob> {
+  const response = await apiRequest(`/report/excel/all?year=${year}`)
+  return await response.blob()
+}
+
+// Interface for public student result
+export interface PublicStudentResult {
+  name: string
+  code: number
+  level: string
+  result: number
+  city: string
+  year: number
+  // Add any other fields returned by the public API
+}
+
+// New API function to fetch public student result
+export async function fetchPublicStudentResult(
+  code: string,
+  year: number,
+  recaptchaResponse: string,
+): Promise<PublicStudentResult | null> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/public/result?code=${code}&year=${year}&recaptchaResponse=${recaptchaResponse}`,
+      {
+        method: "GET",
+        mode: "cors",
+        credentials: "omit",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      },
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || `خطأ في الخادم: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data && Object.keys(data).length > 0) {
+      // Check if data is not empty
+      return data as PublicStudentResult
+    } else {
+      return null // No result found for the given code and year
+    }
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw new Error("لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم")
+    }
+    throw error
+  }
+}
