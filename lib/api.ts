@@ -45,6 +45,15 @@ export interface Student {
   result: number
   city: string
   year: number
+  nationalId: string
+}
+
+// New interface for student details from /student/{code} endpoint
+export interface StudentDetailsData {
+  name: string
+  code: number
+  city: string
+  nationalId: string
 }
 
 export interface StudentResponse {
@@ -89,8 +98,6 @@ export interface UpdateStudentRequest {
   name: string
   nationalId: string
   city: string
-  level: string
-  year: number
 }
 
 // New interfaces for User Management
@@ -220,4 +227,16 @@ export async function fetchPublicStudentResult(
     }
     throw error
   }
+}
+
+// New API function to fetch student exam history
+export async function fetchStudentExamHistory(code: number): Promise<StudentExamHistory[]> {
+  const response = await apiRequest(`/student/history?code=${code}`)
+  return await response.json()
+}
+
+// New API function to fetch single student details by code
+export async function fetchStudentDetailsByCode(code: number): Promise<StudentDetailsData> {
+  const response = await apiRequest(`/student/${code}`)
+  return await response.json()
 }

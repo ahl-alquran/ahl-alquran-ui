@@ -3,12 +3,12 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ProtectedLayout } from "@/components/layout/protected-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -17,62 +17,37 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { Label } from "@/components/ui/label"
 import {
   apiRequest,
-  deleteStudent,
-  updateStudent,
   type Student,
   type StudentResponse,
   type RegisterStudentRequest,
-  type UpdateStudentRequest,
 } from "@/lib/api"
-import { Search, UserPlus, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react"
+import { Search, UserPlus, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 import { useCities } from "@/hooks/use-cities"
-import { useLevels } from "@/hooks/use-levels" // Import the new useLevels hook
+import { useLevels } from "@/hooks/use-levels"
 import { API_BASE_URL } from "@/lib/api"
 
 export default function StudentsPage() {
-  const { cities, loading: citiesLoading, error: citiesError, refetch: refetchCities } = useCities(API_BASE_URL)
-  const { levels, loading: levelsLoading, error: levelsError, refetch: refetchLevels } = useLevels(API_BASE_URL) // Use the new useLevels hook
+  const router = useRouter()
+  const { cities, loading: citiesLoading, error: citiesError } = useCities(API_BASE_URL)
+  const { levels, loading: levelsLoading, error: levelsError } = useLevels(API_BASE_URL)
 
   const [students, setStudents] = useState<Student[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedYear, setSelectedYear] = useState<string>("1446")
+  const [sortBy, setSortBy] = useState<"code" | "name">("code")
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isRegistering, setIsRegistering] = useState(false)
   const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
   const { toast } = useToast()
 
   const [registerForm, setRegisterForm] = useState<RegisterStudentRequest>({
-    name: "",
-    nationalId: "",
-    city: "",
-    level: "",
-    year: Number.parseInt(selectedYear),
-  })
-
-  const [editForm, setEditForm] = useState<UpdateStudentRequest>({
-    code: 0,
     name: "",
     nationalId: "",
     city: "",
@@ -85,30 +60,17 @@ export default function StudentsPage() {
   const hijriYear = currentYear - 578
   const years = Array.from({ length: 5 }, (_, i) => hijriYear - i)
 
-  // Remove the static `levels` array:
-  //- const levels = [
-  //-   "المستوى الأول القرآن الكريم كاملاً",
-  //-   "المستوى الثاني عشرون جزءً",
-  //-   "المستوى الثالث نصف القرآن الكريم",
-  //-   "المستوى الرابع ثمانية أجزاء",
-  //-   "المستوى الخامس ربع القرآن الكريم",
-  //-   "المستوى السادس خمسة أجزاء",
-  //-   "المستوى السابع ثلاثة أجزاء",
-  //-   "المستوى الثامن جزءان",
-  //-   "المستوى التاسع جزء واحد",
-  //- ]
-
   useEffect(() => {
     fetchStudents()
-  }, [selectedYear, currentPage, searchTerm])
+  }, [currentPage, searchTerm, sortBy])
 
   const fetchStudents = async () => {
     setIsLoading(true)
     try {
-      let endpoint = `/student/by-year?year=${selectedYear}&page=${currentPage}&size=${pageSize}&sortBy=result&direction=DESC`
+      let endpoint = `/student/list?page=${currentPage}&size=${pageSize}&sortBy=${sortBy}&direction=ASC`
 
       if (searchTerm.trim()) {
-        endpoint = `/student/by-year/search?year=${selectedYear}&search=${encodeURIComponent(searchTerm)}&page=${currentPage}&size=${pageSize}&sortBy=result&direction=DESC`
+        endpoint = `/student/search?search=${encodeURIComponent(searchTerm)}&page=${currentPage}&size=${pageSize}&sortBy=${sortBy}&direction=ASC`
       }
 
       const response = await apiRequest(endpoint)
@@ -166,75 +128,6 @@ export default function StudentsPage() {
     } finally {
       setIsRegistering(false)
     }
-  }
-
-  const handleEdit = (student: Student) => {
-    setSelectedStudent(student)
-    setEditForm({
-      code: student.code,
-      name: student.name,
-      nationalId: "", // This would need to be included in the Student interface if available
-      city: student.city,
-      level: student.level,
-      year: student.year,
-    })
-    setIsEditDialogOpen(true)
-  }
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsUpdating(true)
-
-    try {
-      await updateStudent(editForm)
-
-      toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث بيانات الطالب بنجاح",
-      })
-
-      setIsEditDialogOpen(false)
-      setSelectedStudent(null)
-      fetchStudents()
-    } catch (error) {
-      toast({
-        title: "خطأ في التحديث",
-        description: "حدث خطأ أثناء تحديث بيانات الطالب",
-        variant: "destructive",
-      })
-    } finally {
-      setIsUpdating(false)
-    }
-  }
-
-  const handleDelete = async (studentCode: number, studentName: string) => {
-    setIsDeleting(true)
-
-    try {
-      const result = await deleteStudent(studentCode)
-
-      toast({
-        title: "تم الحذف بنجاح",
-        description: `تم حذف الطالب ${studentName} بنجاح`,
-      })
-
-      fetchStudents()
-    } catch (error) {
-      toast({
-        title: "خطأ في الحذف",
-        description: "حدث خطأ أثناء حذف الطالب",
-        variant: "destructive",
-      })
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  const getResultBadgeColor = (result: number) => {
-    if (result >= 95) return "bg-green-100 text-green-800"
-    if (result >= 85) return "bg-emerald-100 text-emerald-800"
-    if (result >= 75) return "bg-lime-100 text-lime-800"
-    return "bg-orange-100 text-orange-800"
   }
 
   return (
@@ -351,104 +244,6 @@ export default function StudentsPage() {
           </Dialog>
         </div>
 
-        {/* Edit Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>تعديل بيانات الطالب</DialogTitle>
-              <DialogDescription>تعديل بيانات الطالب {selectedStudent?.name}</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-name">الاسم</Label>
-                <Input
-                  id="edit-name"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-nationalId">الرقم القومي</Label>
-                <Input
-                  id="edit-nationalId"
-                  value={editForm.nationalId}
-                  onChange={(e) => setEditForm({ ...editForm, nationalId: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-city">المدينة</Label>
-                <Select value={editForm.city} onValueChange={(value) => setEditForm({ ...editForm, city: value })}>
-                  <SelectTrigger disabled={citiesLoading || !!citiesError}>
-                    <SelectValue
-                      placeholder={
-                        citiesLoading ? "جاري تحميل المدن..." : citiesError ? "خطأ في تحميل المدن" : "اختر المدينة"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city.name} value={city.name}>
-                        {city.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-level">المستوى</Label>
-                <Select value={editForm.level} onValueChange={(value) => setEditForm({ ...editForm, level: value })}>
-                  <SelectTrigger disabled={levelsLoading || !!levelsError}>
-                    <SelectValue
-                      placeholder={
-                        levelsLoading
-                          ? "جاري تحميل المستويات..."
-                          : levelsError
-                            ? "خطأ في تحميل المستويات"
-                            : "اختر المستوى"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {levels.map((level) => (
-                      <SelectItem key={level.name} value={level.name}>
-                        {level.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-year">السنة</Label>
-                <Select
-                  value={editForm.year.toString()}
-                  onValueChange={(value) => setEditForm({ ...editForm, year: Number.parseInt(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex space-x-2 space-x-reverse">
-                <Button type="submit" className="flex-1" disabled={isUpdating}>
-                  {isUpdating ? "جاري التحديث..." : "تحديث البيانات"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="flex-1">
-                  إلغاء
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-
         <Card>
           <CardHeader>
             <CardTitle>البحث والتصفية</CardTitle>
@@ -467,16 +262,13 @@ export default function StudentsPage() {
                   />
                 </div>
               </div>
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <Select value={sortBy} onValueChange={(value: "code" | "name") => setSortBy(value)}>
                 <SelectTrigger className="w-full sm:w-32">
-                  <SelectValue />
+                  <SelectValue placeholder="الترتيب حسب" />
                 </SelectTrigger>
                 <SelectContent>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="code">الكود</SelectItem>
+                  <SelectItem value="name">الاسم</SelectItem>
                 </SelectContent>
               </Select>
               <Button onClick={handleSearch}>بحث</Button>
@@ -504,58 +296,18 @@ export default function StudentsPage() {
             ) : (
               <div className="space-y-4">
                 {students.map((student) => (
-                  <div key={student.code} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div
+                    key={student.code}
+                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/students/${student.code}`)}
+                  >
                     <div className="flex justify-between items-start">
                       <div className="space-y-2 flex-1">
                         <h3 className="font-semibold text-lg">{student.name}</h3>
                         <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                           <span>الكود: {student.code}</span>
-                          <span>•</span>
-                          <span>المدينة: {student.city}</span>
-                          <span>•</span>
-                          <span>السنة: {student.year}</span>
                         </div>
                         <p className="text-sm text-gray-700">{student.level}</p>
-                      </div>
-                      <div className="flex items-center space-x-2 space-x-reverse">
-                        <Badge className={getResultBadgeColor(student.result)}>{student.result}</Badge>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(student)}
-                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                هل أنت متأكد من حذف الطالب "{student.name}"؟ لا يمكن التراجع عن هذا الإجراء.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(student.code, student.name)}
-                                className="bg-red-600 hover:bg-red-700"
-                                disabled={isDeleting}
-                              >
-                                {isDeleting ? "جاري الحذف..." : "حذف"}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
                       </div>
                     </div>
                   </div>
