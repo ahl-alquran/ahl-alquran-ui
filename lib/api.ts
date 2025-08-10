@@ -89,8 +89,6 @@ export interface RegisterStudentRequest {
   name: string
   nationalId: string
   city: string
-  level: string
-  year: number
 }
 
 export interface UpdateStudentRequest {
@@ -227,6 +225,13 @@ export async function fetchPublicStudentResult(
     }
     throw error
   }
+}
+
+// New interface for student exam history
+export interface StudentExamHistory {
+  year: number
+  level: string
+  result: number
 }
 
 // New API function to fetch student exam history

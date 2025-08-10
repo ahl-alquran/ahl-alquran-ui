@@ -50,9 +50,7 @@ export default function StudentsPage() {
   const [registerForm, setRegisterForm] = useState<RegisterStudentRequest>({
     name: "",
     nationalId: "",
-    city: "",
-    level: "",
-    year: Number.parseInt(selectedYear),
+    city: ""
   })
 
   const pageSize = 10
@@ -115,8 +113,6 @@ export default function StudentsPage() {
         name: "",
         nationalId: "",
         city: "",
-        level: "",
-        year: Number.parseInt(selectedYear),
       })
       fetchStudents()
     } catch (error) {
@@ -192,50 +188,6 @@ export default function StudentsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="level">المستوى</Label>
-                  <Select
-                    value={registerForm.level}
-                    onValueChange={(value) => setRegisterForm({ ...registerForm, level: value })}
-                  >
-                    <SelectTrigger disabled={levelsLoading || !!levelsError}>
-                      <SelectValue
-                        placeholder={
-                          levelsLoading
-                            ? "جاري تحميل المستويات..."
-                            : levelsError
-                              ? "خطأ في تحميل المستويات"
-                              : "اختر المستوى"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {levels.map((level) => (
-                        <SelectItem key={level.name} value={level.name}>
-                          {level.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="year">السنة</Label>
-                  <Select
-                    value={registerForm.year.toString()}
-                    onValueChange={(value) => setRegisterForm({ ...registerForm, year: Number.parseInt(value) })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
                 <Button type="submit" className="w-full" disabled={isRegistering}>
                   {isRegistering ? "جاري التسجيل..." : "تسجيل الطالب"}
                 </Button>
@@ -275,7 +227,6 @@ export default function StudentsPage() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>قائمة الطلاب ({totalElements.toLocaleString("ar-EG")} طالب)</CardTitle>
