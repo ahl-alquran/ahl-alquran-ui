@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
@@ -8,12 +9,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { BookOpen, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { BookOpen } from "lucide-react"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
   const router = useRouter()
@@ -24,25 +26,13 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const success = await login(username, password)
-      if (success) {
-        toast({
-          title: "تم تسجيل الدخول بنجاح",
-          description: "مرحباً بك في نظام أهل القرآن",
-        })
-        router.push("/dashboard")
-      } else {
-        toast({
-          title: "خطأ في تسجيل الدخول",
-          description: "اسم المستخدم أو كلمة المرور غير صحيحة",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ غير متوقع"
+      await login(username, password)
+      router.push("/dashboard")
+    } catch (error: any) {
+      console.error("Login error:", error)
       toast({
         title: "خطأ في تسجيل الدخول",
-        description: errorMessage,
+        description: error.message || "اسم المستخدم أو كلمة المرور غير صحيحة",
         variant: "destructive",
       })
     } finally {
@@ -51,41 +41,73 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
-      <div className="w-full max-w-md space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <div className="flex justify-center">
+            <BookOpen className="h-12 w-12 text-green-600" />
+          </div>
+          <h2 className="mt-6 text-2xl sm:text-3xl font-bold text-gray-900">أهل القرآن</h2>
+          <p className="mt-2 text-sm text-gray-600">نظام إدارة الطلاب</p>
+        </div>
+
         <Card className="w-full">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <BookOpen className="h-12 w-12 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">أهل القرآن</CardTitle>
-            <CardDescription>نظام إدارة الطلاب</CardDescription>
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl sm:text-2xl text-center">تسجيل الدخول</CardTitle>
+            <CardDescription className="text-center text-sm sm:text-base">
+              أدخل بيانات الدخول للوصول إلى النظام
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">اسم المستخدم</Label>
+                <Label htmlFor="username" className="text-sm sm:text-base">
+                  اسم المستخدم
+                </Label>
                 <Input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  disabled={isLoading}
+                  className="w-full"
+                  placeholder="أدخل اسم المستخدم"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">كلمة المرور</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
+                <Label htmlFor="password" className="text-sm sm:text-base">
+                  كلمة المرور
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full pr-10"
+                    placeholder="أدخل كلمة المرور"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-green-600 hover:bg-green-700 text-sm sm:text-base py-2 sm:py-3"
+                disabled={isLoading}
+              >
                 {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
               </Button>
             </form>

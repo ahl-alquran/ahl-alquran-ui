@@ -18,13 +18,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import {
-  apiRequest,
-  type Student,
-  type StudentResponse,
-  type RegisterStudentRequest,
-} from "@/lib/api"
-import { Search, UserPlus, ChevronLeft, ChevronRight } from 'lucide-react'
+import { apiRequest, type Student, type StudentResponse, type RegisterStudentRequest } from "@/lib/api"
+import { Search, UserPlus, ChevronLeft, ChevronRight } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useCities } from "@/hooks/use-cities"
 import { useLevels } from "@/hooks/use-levels"
@@ -50,7 +45,7 @@ export default function StudentsPage() {
   const [registerForm, setRegisterForm] = useState<RegisterStudentRequest>({
     name: "",
     nationalId: "",
-    city: ""
+    city: "",
   })
 
   const pageSize = 10
@@ -128,21 +123,21 @@ export default function StudentsPage() {
 
   return (
     <ProtectedLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">إدارة الطلاب</h1>
-            <p className="text-gray-600">قائمة الطلاب المسجلين</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">إدارة الطلاب</h1>
+            <p className="text-gray-600 text-sm sm:text-base">قائمة الطلاب المسجلين</p>
           </div>
 
           <Dialog open={isRegisterDialogOpen} onOpenChange={setIsRegisterDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="flex items-center space-x-2 space-x-reverse">
+              <Button className="flex items-center space-x-2 space-x-reverse w-full sm:w-auto">
                 <UserPlus className="h-4 w-4" />
                 <span>تسجيل طالب جديد</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md mx-4 sm:mx-auto">
               <DialogHeader>
                 <DialogTitle>تسجيل طالب جديد</DialogTitle>
                 <DialogDescription>أدخل بيانات الطالب الجديد</DialogDescription>
@@ -198,10 +193,10 @@ export default function StudentsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>البحث والتصفية</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">البحث والتصفية</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -214,29 +209,36 @@ export default function StudentsPage() {
                   />
                 </div>
               </div>
-              <Select value={sortBy} onValueChange={(value: "code" | "name") => setSortBy(value)}>
-                <SelectTrigger className="w-full sm:w-32">
-                  <SelectValue placeholder="الترتيب حسب" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="code">الكود</SelectItem>
-                  <SelectItem value="name">الاسم</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button onClick={handleSearch}>بحث</Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Select value={sortBy} onValueChange={(value: "code" | "name") => setSortBy(value)}>
+                  <SelectTrigger className="w-full sm:w-32">
+                    <SelectValue placeholder="الترتيب حسب" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="code">الكود</SelectItem>
+                    <SelectItem value="name">الاسم</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleSearch} className="w-full sm:w-auto">
+                  بحث
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
-            <CardTitle>قائمة الطلاب ({totalElements.toLocaleString("ar-EG")} طالب)</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">
+              قائمة الطلاب ({totalElements.toLocaleString("ar-EG")} طالب)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="space-y-4">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="h-20 bg-gray-200 rounded-lg"></div>
+                    <div className="h-16 sm:h-20 bg-gray-200 rounded-lg"></div>
                   </div>
                 ))}
               </div>
@@ -245,20 +247,20 @@ export default function StudentsPage() {
                 <p className="text-gray-500">لا توجد نتائج</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {students.map((student) => (
                   <div
                     key={student.code}
-                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
                     onClick={() => router.push(`/students/${student.code}`)}
                   >
                     <div className="flex justify-between items-start">
-                      <div className="space-y-2 flex-1">
-                        <h3 className="font-semibold text-lg">{student.name}</h3>
-                        <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                      <div className="space-y-1 sm:space-y-2 flex-1 min-w-0">
+                        <h3 className="font-semibold text-base sm:text-lg truncate">{student.name}</h3>
+                        <div className="flex flex-wrap gap-2 text-xs sm:text-sm text-gray-600">
                           <span>الكود: {student.code}</span>
                         </div>
-                        <p className="text-sm text-gray-700">{student.level}</p>
+                        <p className="text-xs sm:text-sm text-gray-700 truncate">{student.level}</p>
                       </div>
                     </div>
                   </div>
@@ -267,27 +269,29 @@ export default function StudentsPage() {
             )}
 
             {totalPages > 1 && (
-              <div className="flex justify-between items-center mt-6">
-                <div className="text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
+                <div className="text-sm text-gray-600 order-2 sm:order-1">
                   صفحة {currentPage + 1} من {totalPages}
                 </div>
-                <div className="flex space-x-2 space-x-reverse">
+                <div className="flex space-x-2 space-x-reverse order-1 sm:order-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                     disabled={currentPage === 0}
+                    className="flex items-center gap-1"
                   >
                     <ChevronRight className="h-4 w-4" />
-                    السابق
+                    <span className="hidden sm:inline">السابق</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                     disabled={currentPage === totalPages - 1}
+                    className="flex items-center gap-1"
                   >
-                    التالي
+                    <span className="hidden sm:inline">التالي</span>
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                 </div>
