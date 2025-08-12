@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { API_BASE_URL } from "@/lib/config" // Import API_BASE_URL
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -73,7 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch("http://localhost:8080/auth/apiLogin", {
+      const response = await fetch(`${API_BASE_URL}/auth/apiLogin`, {
+        // Replace hardcoded URL
         method: "POST",
         headers: {
           "Content-Type": "application/json",

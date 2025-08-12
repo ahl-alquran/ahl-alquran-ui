@@ -1,7 +1,9 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { ProtectedLayout } from "@/components/layout/protected-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -9,14 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,27 +25,30 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Label } from "@/components/ui/label"
 import {
-  apiRequest,
   deleteStudent,
   updateStudent,
-  type StudentDetailsData, // Changed from Student
+  type StudentDetailsData,
   type StudentExamHistory,
   fetchStudentExamHistory,
-  fetchStudentDetailsByCode, // New function for fetching details
+  fetchStudentDetailsByCode,
   type UpdateStudentRequest,
   API_BASE_URL,
+  registerStudentExam,
 } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Edit, Trash2 } from 'lucide-react'
+import { Loader2, Edit, Trash2, Plus } from "lucide-react"
 import { useCities } from "@/hooks/use-cities"
+import { useLevels } from "@/hooks/use-levels"
 
 export default function StudentDetailsPage() {
   const params = useParams()
-  const studentCode = typeof params.code === 'string' ? Number.parseInt(params.code) : undefined
+  const router = useRouter()
+  const studentCode = typeof params.code === "string" ? Number.parseInt(params.code) : undefined
 
   const { cities, loading: citiesLoading, error: citiesError } = useCities(API_BASE_URL)
+  const { levels, loading: levelsLoading, error: levelsError } = useLevels(API_BASE_URL)
 
-  const [studentDetails, setStudentDetails] = useState<StudentDetailsData | null>(null) // Changed type
+  const [studentDetails, setStudentDetails] = useState<StudentDetailsData | null>(null)
   const [examHistory, setExamHistory] = useState<StudentExamHistory[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,12 +58,21 @@ export default function StudentDetailsPage() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Register exam dialog state
+  const [isRegisterDialogOpen, setIsRegisterDialogOpen] = useState(false)
+  const [selectedLevel, setSelectedLevel] = useState<string>("")
+  const [isRegistering, setIsRegistering] = useState(false)
+
   const [editForm, setEditForm] = useState<UpdateStudentRequest>({
     code: 0,
     name: "",
     nationalId: "",
     city: "",
   })
+
+  // Compute current Hijri-like year as used elsewhere in the project
+  const currentYear = new Date().getFullYear()
+  const hijriYear = currentYear - 578
 
   useEffect(() => {
     if (studentCode) {
@@ -74,13 +81,13 @@ export default function StudentDetailsPage() {
       setError("رمز الطالب غير صالح.")
       setIsLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentCode])
 
   const fetchDetailsAndHistory = async (code: number) => {
     setIsLoading(true)
     setError(null)
     try {
-      // Fetch student details using the new dedicated API
       const fetchedStudent = await fetchStudentDetailsByCode(code)
       setStudentDetails(fetchedStudent)
       setEditForm({
@@ -90,10 +97,8 @@ export default function StudentDetailsPage() {
         city: fetchedStudent.city,
       })
 
-      // Fetch exam history
       const historyData = await fetchStudentExamHistory(code)
       setExamHistory(historyData)
-
     } catch (err: any) {
       console.error("Error fetching student details or history:", err)
       setError(err.message || "حدث خطأ أثناء جلب بيانات الطالب أو تاريخ الامتحانات.")
@@ -106,6 +111,19 @@ export default function StudentDetailsPage() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const refreshHistory = async (code: number) => {
+    try {
+      const historyData = await fetchStudentExamHistory(code)
+      setExamHistory(historyData)
+    } catch (err: any) {
+      toast({
+        title: "تعذر تحديث تاريخ الامتحانات",
+        description: err.message || "حاول مرة أخرى لاحقًا.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -135,12 +153,12 @@ export default function StudentDetailsPage() {
 
       setIsEditDialogOpen(false)
       if (studentCode) {
-        fetchDetailsAndHistory(studentCode) // Re-fetch to update displayed details
+        await fetchDetailsAndHistory(studentCode)
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "خطأ في التحديث",
-        description: "حدث خطأ أثناء تحديث بيانات الطالب",
+        description: error?.message || "حدث خطأ أثناء تحديث بيانات الطالب",
         variant: "destructive",
       })
     } finally {
@@ -149,7 +167,7 @@ export default function StudentDetailsPage() {
   }
 
   const handleDelete = async () => {
-    if (!studentDetails) return;
+    if (!studentDetails) return
 
     setIsDeleting(true)
     try {
@@ -160,16 +178,47 @@ export default function StudentDetailsPage() {
         description: `تم حذف الطالب ${studentDetails.name} بنجاح`,
       })
 
-      // Redirect to students list after successful deletion
       window.location.href = "/students"
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "خطأ في الحذف",
-        description: "حدث خطأ أثناء حذف الطالب",
+        description: error?.message || "حدث خطأ أثناء حذف الطالب",
         variant: "destructive",
       })
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handleRegisterExam = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!studentDetails) return
+    if (!selectedLevel) {
+      toast({
+        title: "اختر المستوى",
+        description: "يرجى اختيار المستوى قبل التسجيل.",
+        variant: "destructive",
+      })
+      return
+    }
+    setIsRegistering(true)
+    try {
+      await registerStudentExam(studentDetails.code, selectedLevel, hijriYear)
+      toast({
+        title: "تم تسجيل الاختبار",
+        description: `تم تسجيل اختبار للطالب ${studentDetails.name} في مستوى "${selectedLevel}" لسنة ${hijriYear}`,
+      })
+      setIsRegisterDialogOpen(false)
+      setSelectedLevel("")
+      await refreshHistory(studentDetails.code)
+    } catch (error: any) {
+      toast({
+        title: "فشل تسجيل الاختبار",
+        description: error?.message || "حدث خطأ أثناء تسجيل الاختبار.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsRegistering(false)
     }
   }
 
@@ -220,19 +269,29 @@ export default function StudentDetailsPage() {
   return (
     <ProtectedLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900"> {studentDetails.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{studentDetails.name}</h1>
+            <p className="text-gray-600">بيانات الطالب وتاريخ الامتحانات</p>
           </div>
-          <div className="flex items-center space-x-2 space-x-reverse">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setIsRegisterDialogOpen(true)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              تسجيل اختبار
+            </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleEdit}
-              className="text-green-600 hover:text-green-700 hover:bg-green-50"
+              className="text-green-600 hover:text-green-700 hover:bg-green-50 bg-transparent"
             >
-              <Edit className="h-4 w-4" />
-              <span className="mr-2">تعديل</span>
+              <Edit className="h-4 w-4 mr-2" />
+              تعديل
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -241,8 +300,8 @@ export default function StudentDetailsPage() {
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="mr-2">حذف</span>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  حذف
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -283,12 +342,11 @@ export default function StudentDetailsPage() {
             <div>
               <p className="text-sm text-gray-500">المدينة:</p>
               <p className="font-medium">{studentDetails.city}</p>
-            </div>        
+            </div>
             <div>
               <p className="text-sm text-gray-500">الرقم القومي:</p>
               <p className="font-medium">{studentDetails.nationalId}</p>
             </div>
-            {/* Level and Year are no longer displayed here as they are not returned by the new API */}
           </CardContent>
         </Card>
 
@@ -315,9 +373,24 @@ export default function StudentDetailsPage() {
                         <TableCell>{history.year}</TableCell>
                         <TableCell>{history.level}</TableCell>
                         <TableCell>
-                          <Badge className={getResultBadgeColor(history.result)}>
-                            {history.result}
-                          </Badge>
+                          {history.result == null ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                if (studentCode) {
+                                  router.push(`/students/${studentCode}/print`)
+                                }
+                              }}
+                              className="whitespace-nowrap"
+                              aria-label="طباعة الاستمارة"
+                              title="طباعة الاستمارة"
+                            >
+                              طباعة الاستمارة
+                            </Button>
+                          ) : (
+                            <Badge className={getResultBadgeColor(history.result)}>{history.result}</Badge>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -374,12 +447,50 @@ export default function StudentDetailsPage() {
                 </SelectContent>
               </Select>
             </div>
-            {/* Level and Year fields removed from edit form */}
-            <div className="flex space-x-2 space-x-reverse">
+            <div className="flex gap-2">
               <Button type="submit" className="flex-1" disabled={isUpdating}>
                 {isUpdating ? "جاري التحديث..." : "تحديث البيانات"}
               </Button>
               <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="flex-1">
+                إلغاء
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Register Exam Dialog */}
+      <Dialog open={isRegisterDialogOpen} onOpenChange={setIsRegisterDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>تسجيل اختبار جديد</DialogTitle>
+            <DialogDescription>اختر المستوى وسيتم استخدام سنة {hijriYear} تلقائيًا.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleRegisterExam} className="space-y-4">
+            <div className="space-y-2">
+              <Label>المستوى</Label>
+              <Select value={selectedLevel} onValueChange={setSelectedLevel} disabled={levelsLoading || !!levelsError}>
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      levelsLoading ? "جاري تحميل المستويات..." : levelsError ? "تعذر تحميل المستويات" : "اختر المستوى"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {levels.map((level) => (
+                    <SelectItem key={level.name} value={level.name}>
+                      {level.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" className="flex-1" disabled={isRegistering || !selectedLevel}>
+                {isRegistering ? "جاري التسجيل..." : "تسجيل"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setIsRegisterDialogOpen(false)} className="flex-1">
                 إلغاء
               </Button>
             </div>

@@ -26,7 +26,13 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
         window.location.href = "/login"
         throw new Error("انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى")
       }
-      throw new Error(`خطأ في الخادم: ${response.status}`)
+      // Try to parse error body, otherwise show status
+      let message = `خطأ في الخادم: ${response.status}`
+      try {
+        const err = await response.json()
+        if (err?.message) message = err.message
+      } catch {}
+      throw new Error(message)
     }
 
     return response
@@ -184,7 +190,6 @@ export interface PublicStudentResult {
   result: number
   city: string
   year: number
-  // Add any other fields returned by the public API
 }
 
 // New API function to fetch public student result
@@ -214,10 +219,9 @@ export async function fetchPublicStudentResult(
 
     const data = await response.json()
     if (data && Object.keys(data).length > 0) {
-      // Check if data is not empty
       return data as PublicStudentResult
     } else {
-      return null // No result found for the given code and year
+      return null
     }
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -244,4 +248,23 @@ export async function fetchStudentExamHistory(code: number): Promise<StudentExam
 export async function fetchStudentDetailsByCode(code: number): Promise<StudentDetailsData> {
   const response = await apiRequest(`/student/${code}`)
   return await response.json()
+}
+
+// New API function to register a student's exam
+export interface RegisterExamRequest {
+  code: string
+  level: string
+  year: string
+}
+
+export async function registerStudentExam(code: number, level: string, year: number): Promise<void> {
+  const payload: RegisterExamRequest = {
+    code: String(code),
+    level,
+    year: String(year),
+  }
+  await apiRequest(`/student/exam/register`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
 }
