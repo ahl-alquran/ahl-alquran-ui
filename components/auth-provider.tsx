@@ -116,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Login error:", error)
       // Check if it's a network error
       if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw new Error("لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم على المنفذ 8080")
+        throw new Error("لا يمكن الاتصال بالخادم. تأكد من تشغيل الخادم ")
       }
       throw new Error("حدث خطأ أثناء تسجيل الدخول")
     }
