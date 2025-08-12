@@ -19,7 +19,7 @@ export default function DashboardPage() {
   const [totalStudents, setTotalStudents] = useState<number>(0)
   const [studentsByYear, setStudentsByYear] = useState<number>(0)
   const [studentsByLevel, setStudentsByLevel] = useState<LevelStudentCount[]>([])
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString())
+  const [selectedYear, setSelectedYear] = useState<string>((new Date().getFullYear()- 578).toString())
   const [isLoading, setIsLoading] = useState(true)
   const [isLevelsLoading, setIsLevelsLoading] = useState(true)
   const [downloadingLevel, setDownloadingLevel] = useState<string | null>(null) // State for individual level download loading
