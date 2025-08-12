@@ -19,6 +19,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
+      <head>
+        {/* Google reCAPTCHA v3 script */}
+        <script
+          src={`https://www.google.com/recaptcha/enterprise.js?render=6LfkFpsrAAAAAF7pPzh0bVUYGJ4B8YSDLOgOXHh-`}
+          async
+          defer
+        ></script>
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           {children}

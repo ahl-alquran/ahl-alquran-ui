@@ -2,13 +2,15 @@
 
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
-import { BookOpen, LogOut, Users, BarChart3 } from "lucide-react"
+import { BookOpen, LogOut, Users, BarChart3, UserCog } from "lucide-react" // Import UserCog icon
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 export function Navbar() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
+
+  const isAdmin = user?.authorities?.includes("ADMIN") // Check for ADMIN authority
 
   return (
     <nav className="bg-white shadow-sm border-b">
@@ -42,8 +44,20 @@ export function Navbar() {
               <span>الطلاب</span>
             </Link>
 
+            {isAdmin && ( // Conditionally render Users tab for ADMIN
+              <Link
+                href="/users"
+                className={`flex items-center space-x-2 space-x-reverse px-3 py-2 rounded-md text-sm font-medium ${
+                  pathname === "/users" ? "bg-green-100 text-green-700" : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <UserCog className="h-4 w-4" />
+                <span>المستخدمون</span>
+              </Link>
+            )}
+
             <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-700">
-              <span>مرحباً، {user?.username}</span>
+              <span>مرحباً، {user?.name || user?.username}</span> {/* Display name, fallback to username */}
             </div>
 
             <Button

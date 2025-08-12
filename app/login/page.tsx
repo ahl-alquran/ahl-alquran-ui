@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { BookOpen } from "lucide-react"
-import { ConnectionStatus } from "@/components/connection-status"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -54,7 +53,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
       <div className="w-full max-w-md space-y-4">
-        <ConnectionStatus />
         <Card className="w-full">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
