@@ -89,8 +89,46 @@ export default function StudentPrintPage() {
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       {/* Local style to ensure any global nav/header is hidden on this route just in case */}
-      <style jsx global>{`
-        header, nav { display: none !important; }
+            <style jsx global>{`
+        @media print {
+          /* Hide navigation, headers, and other UI elements */
+          header, nav, .print\\:hidden { 
+            display: none !important; 
+          }
+          
+          /* Hide reCAPTCHA elements */
+          .grecaptcha-badge,
+          iframe[src*="recaptcha"],
+          div[class*="recaptcha"],
+          #recaptcha-container,
+          [data-sitekey] {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
+          /* Hide any floating elements that might interfere */
+          div[style*="position: fixed"],
+          div[style*="position: absolute"][style*="bottom"],
+          div[style*="z-index"] {
+            display: none !important;
+          }
+          
+          /* Ensure clean print layout */
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          
+          /* Remove shadows and borders for cleaner print */
+          .shadow, .shadow-md, .shadow-lg {
+            box-shadow: none !important;
+          }
+        }
+        
+        /* Also hide during screen view for consistency */
+        header, nav { 
+          display: none !important; 
+        }
       `}</style>
 
       <main className="max-w-3xl mx-auto p-4 print:max-w-none">
@@ -108,8 +146,8 @@ export default function StudentPrintPage() {
 
         <Card className="shadow print:shadow-none">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">استمارة دخول الاختبار</CardTitle>
-            <p className="text-gray-600 mt-1">يرجى التأكد من صحة البيانات قبل الطباعة</p>
+            <CardTitle className="text-2xl font-bold">مسابقة أهل القرآن</CardTitle>
+            <p className="text-gray-600 mt-1">مسابقة أهل القرآن </p>
           </CardHeader>
           <CardContent className="space-y-6">
             <section>
@@ -139,12 +177,16 @@ export default function StudentPrintPage() {
               {firstHistory ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="border rounded p-3">
+                    <div className="text-xs text-gray-500 mb-1">المستوى</div>
+                    <div className="font-medium">{firstHistory.level}</div>
+                  </div>
+                  <div className="border rounded p-3">
                     <div className="text-xs text-gray-500 mb-1">السنة</div>
                     <div className="font-medium">{firstHistory.year}</div>
                   </div>
                   <div className="border rounded p-3">
-                    <div className="text-xs text-gray-500 mb-1">المستوى</div>
-                    <div className="font-medium">{firstHistory.level}</div>
+                    <div className="text-xs text-gray-500 mb-1">النتيجة</div>
+                    <div className="font-medium">---------------</div>
                   </div>
                 </div>
               ) : (
@@ -152,16 +194,41 @@ export default function StudentPrintPage() {
               )}
             </section>
 
-            <section className="mt-6">
-              <h2 className="font-semibold text-lg mb-4">التوقيعات</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div className="border-t border-dashed pt-8">
-                  <div className="text-sm text-gray-600">توقيع الطالب</div>
+              <div className="border-b border-dashed pt-16">
                 </div>
-                <div className="border-t border-dashed pt-8">
-                  <div className="text-sm text-gray-600">ختم الإدارة</div>
+
+            <section>
+              <h2 className="font-semibold text-lg mb-3">نسخة الطالب</h2>
+              {firstHistory ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="border rounded p-3">
+                  <div className="text-xs text-gray-500 mb-1">الاسم</div>
+                  <div className="font-medium">{student.name}</div>
+                </div>
+                <div className="border rounded p-3">
+                  <div className="text-xs text-gray-500 mb-1">الكود</div>
+                  <div className="font-medium">{student.code}</div>
+                </div>
+                <div className="border rounded p-3">
+                  <div className="text-xs text-gray-500 mb-1">المستوى</div>
+                  <div className="font-medium">{firstHistory.level}</div>
+                </div>
+                <div className="border rounded p-3">
+                  <div className="text-xs text-gray-500 mb-1">المدينة</div>
+                  <div className="font-medium">{student.city}</div>
+                </div>
+                <div className="border rounded p-3">
+                  <div className="text-xs text-gray-500 mb-1">التاريخ</div>
+                  <div className="font-medium">-</div>
+                </div>
+                <div className="border rounded p-3">
+                  <div className="text-xs text-gray-500 mb-1">رقم المسلسل</div>
+                  <div className="font-medium">-</div>
                 </div>
               </div>
+              ) : (
+                <div className="text-gray-600">لا يوجد سجل امتحان لعرضه.</div>
+              )}
             </section>
           </CardContent>
         </Card>
