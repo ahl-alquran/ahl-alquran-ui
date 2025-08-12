@@ -232,7 +232,7 @@ export default function StudentDetailsPage() {
   if (isLoading) {
     return (
       <ProtectedLayout>
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto" />
             <p className="mt-4 text-gray-600">جاري تحميل بيانات الطالب...</p>
@@ -245,7 +245,7 @@ export default function StudentDetailsPage() {
   if (error) {
     return (
       <ProtectedLayout>
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center text-red-500">
             <p>{error}</p>
           </div>
@@ -257,7 +257,7 @@ export default function StudentDetailsPage() {
   if (!studentDetails) {
     return (
       <ProtectedLayout>
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center text-gray-500">
             <p>لم يتم العثور على الطالب.</p>
           </div>
@@ -268,18 +268,18 @@ export default function StudentDetailsPage() {
 
   return (
     <ProtectedLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{studentDetails.name}</h1>
-            <p className="text-gray-600">بيانات الطالب وتاريخ الامتحانات</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{studentDetails.name}</h1>
+            <p className="text-gray-600 text-sm sm:text-base">بيانات الطالب وتاريخ الامتحانات</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               variant="default"
               size="sm"
               onClick={() => setIsRegisterDialogOpen(true)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
             >
               <Plus className="h-4 w-4 mr-2" />
               تسجيل اختبار
@@ -288,7 +288,7 @@ export default function StudentDetailsPage() {
               variant="outline"
               size="sm"
               onClick={handleEdit}
-              className="text-green-600 hover:text-green-700 hover:bg-green-50 bg-transparent"
+              className="text-green-600 hover:text-green-700 hover:bg-green-50 bg-transparent w-full sm:w-auto"
             >
               <Edit className="h-4 w-4 mr-2" />
               تعديل
@@ -298,24 +298,24 @@ export default function StudentDetailsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent w-full sm:w-auto"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   حذف
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="mx-4 sm:mx-auto">
                 <AlertDialogHeader>
                   <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                   <AlertDialogDescription>
                     هل أنت متأكد من حذف الطالب "{studentDetails.name}"؟ لا يمكن التراجع عن هذا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                  <AlertDialogCancel className="w-full sm:w-auto">إلغاء</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                     disabled={isDeleting}
                   >
                     {isDeleting ? "جاري الحذف..." : "حذف"}
@@ -328,12 +328,12 @@ export default function StudentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>معلومات الطالب</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">معلومات الطالب</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">الاسم:</p>
-              <p className="font-medium">{studentDetails.name}</p>
+              <p className="font-medium break-words">{studentDetails.name}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">الكود:</p>
@@ -341,7 +341,7 @@ export default function StudentDetailsPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500">المدينة:</p>
-              <p className="font-medium">{studentDetails.city}</p>
+              <p className="font-medium break-words">{studentDetails.city}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">الرقم القومي:</p>
@@ -352,7 +352,7 @@ export default function StudentDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>تاريخ الامتحانات</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">تاريخ الامتحانات</CardTitle>
           </CardHeader>
           <CardContent>
             {examHistory.length === 0 ? (
@@ -370,8 +370,12 @@ export default function StudentDetailsPage() {
                   <TableBody>
                     {examHistory.map((history, index) => (
                       <TableRow key={index}>
-                        <TableCell>{history.year}</TableCell>
-                        <TableCell>{history.level}</TableCell>
+                        <TableCell className="font-medium">{history.year}</TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="truncate" title={history.level}>
+                            {history.level}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           {history.result == null ? (
                             <Button
@@ -382,7 +386,7 @@ export default function StudentDetailsPage() {
                                   router.push(`/students/${studentCode}/print`)
                                 }
                               }}
-                              className="whitespace-nowrap"
+                              className="text-xs sm:text-sm whitespace-nowrap"
                               aria-label="طباعة الاستمارة"
                               title="طباعة الاستمارة"
                             >
@@ -404,7 +408,7 @@ export default function StudentDetailsPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md mx-4 sm:mx-auto">
           <DialogHeader>
             <DialogTitle>تعديل بيانات الطالب</DialogTitle>
             <DialogDescription>تعديل بيانات الطالب {studentDetails?.name}</DialogDescription>
@@ -447,7 +451,7 @@ export default function StudentDetailsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button type="submit" className="flex-1" disabled={isUpdating}>
                 {isUpdating ? "جاري التحديث..." : "تحديث البيانات"}
               </Button>
@@ -461,7 +465,7 @@ export default function StudentDetailsPage() {
 
       {/* Register Exam Dialog */}
       <Dialog open={isRegisterDialogOpen} onOpenChange={setIsRegisterDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md mx-4 sm:mx-auto">
           <DialogHeader>
             <DialogTitle>تسجيل اختبار جديد</DialogTitle>
             <DialogDescription>اختر المستوى وسيتم استخدام سنة {hijriYear} تلقائيًا.</DialogDescription>
@@ -486,7 +490,7 @@ export default function StudentDetailsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button type="submit" className="flex-1" disabled={isRegistering || !selectedLevel}>
                 {isRegistering ? "جاري التسجيل..." : "تسجيل"}
               </Button>
