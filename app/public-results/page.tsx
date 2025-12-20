@@ -31,10 +31,10 @@ export default function PublicResultsPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Generate years for the select dropdown (e.g., current year and past 5 years)
+    // Generate years for the select dropdown (e.g., current year and past 2 years)
     const currentYear = new Date().getFullYear()
     const hijriYear = currentYear - 578
-    const generatedYears = Array.from({ length: 5 }, (_, i) => hijriYear - i)
+    const generatedYears = Array.from({ length: 2 }, (_, i) => hijriYear - i)
     setYears(generatedYears)
     setSelectedYear(currentYear.toString()) // Set current year as default
 
@@ -66,7 +66,7 @@ export default function PublicResultsPage() {
       if (!studentCode || !selectedYear) {
         toast({
           title: "خطأ",
-          description: "الرجاء إدخال رمز الطالب واختيار السنة.",
+          description: "الرجاء إدخال كود الطالب واختيار السنة.",
           variant: "destructive",
         })
         return
@@ -117,14 +117,14 @@ export default function PublicResultsPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">نتائج الطلاب</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="studentCode">رمز الطالب</Label>
+              <Label htmlFor="studentCode">كود الطالب</Label>
               <Input
                 id="studentCode"
                 type="text"
@@ -144,7 +144,7 @@ export default function PublicResultsPage() {
                 <SelectContent>
                   {years.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
-                        هـ {year}
+                      هـ {year}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -173,30 +173,22 @@ export default function PublicResultsPage() {
           {result && (
             <div className="mt-6 space-y-4">
               <h3 className="text-xl font-semibold text-center">تفاصيل النتيجة</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">الاسم:</p>
                   <p className="font-medium">{result.name}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">الرمز:</p>
+                <div className="flex items-center justify-between border-b pb-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">الكود:</p>
                   <p className="font-medium">{result.code}</p>
                 </div>
-                <div>
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">المستوى:</p>
                   <p className="font-medium">{result.level}</p>
                 </div>
-                <div>
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">النتيجة:</p>
-                  <p className="font-medium">{result.result}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">المدينة:</p>
-                  <p className="font-medium">{result.city}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">السنة:</p>
-                  <p className="font-medium">{result.year}</p>
+                  <p className="font-medium">{result.result < 0 ? "لا توجد نتيجة" : result.result}</p>
                 </div>
               </div>
             </div>

@@ -25,7 +25,7 @@ export default function StudentPrintPage() {
   useEffect(() => {
     const load = async () => {
       if (!studentCode) {
-        setError("رمز الطالب غير صالح.")
+        setError("كود الطالب غير صالح.")
         setLoading(false)
         return
       }

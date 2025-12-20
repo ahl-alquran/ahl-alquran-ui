@@ -119,7 +119,7 @@ export interface RegisterUserRequest {
   mobile: string // Matches the /user/add request body
   username: string
   password: string
-  role: "ADMIN" | "USER" // Specific roles
+  role: "ADMIN" | "USER" | "TESTER" // Specific roles
 }
 
 // New API functions for User Management
@@ -266,5 +266,37 @@ export async function registerStudentExam(code: number, level: string, year: num
   await apiRequest(`/student/exam/register`, {
     method: "POST",
     body: JSON.stringify(payload),
+  })
+}
+
+export interface TesterStudentResult {
+  name: string
+  code: number
+  level: string
+  result: number
+  city: string
+  year: number
+}
+
+// Fetch student result for tester (authenticated)
+export async function fetchStudentResultForTester(code: string, year: number): Promise<TesterStudentResult | null> {
+  try {
+    const response = await apiRequest(`/student/details?code=${code}&year=${year}`)
+  return await response.json()
+    const data = await response.json()
+    if (data && Object.keys(data).length > 0) {
+      return data as TesterStudentResult
+    }
+    return null
+  } catch (error) {
+    throw error
+  }
+}
+
+// Update student result (only allowed if result is 0)
+export async function updateStudentResult(code: number, year: number, result: number): Promise<void> {
+  await apiRequest("/student/update-result", {
+    method: "POST",
+    body: JSON.stringify({ code, year, result }),
   })
 }

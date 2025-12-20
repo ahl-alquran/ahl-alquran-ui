@@ -63,7 +63,7 @@ export default function StudentsPage() {
       let endpoint = `/student/list?page=${currentPage}&size=${pageSize}&sortBy=${sortBy}&direction=ASC`
 
       if (searchTerm.trim()) {
-        endpoint = `/student/search?search=${encodeURIComponent(searchTerm)}&page=${currentPage}&size=${pageSize}&sortBy=${sortBy}&direction=ASC`
+        endpoint = `/student/search?search=${encodeURIComponent(searchTerm)}&page=${currentPage}&size=${pageSize}&sortBy=${sortBy}&direction=DESC`
       }
 
       const response = await apiRequest(endpoint)
