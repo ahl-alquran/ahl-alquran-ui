@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
+import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
@@ -45,7 +46,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <BookOpen className="h-12 w-12 text-green-600" />
+            <img src="/logo.png" alt="App Icon" width={70} height={70} className="mx-auto"/>
           </div>
           <h2 className="mt-6 text-2xl sm:text-3xl font-bold text-gray-900">أهل القرآن</h2>
           <p className="mt-2 text-sm text-gray-600">نظام إدارة الطلاب</p>
