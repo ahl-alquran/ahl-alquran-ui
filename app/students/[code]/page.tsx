@@ -78,7 +78,7 @@ export default function StudentDetailsPage() {
     if (studentCode) {
       fetchDetailsAndHistory(studentCode)
     } else {
-      setError("رمز الطالب غير صالح.")
+      setError("كود الطالب غير صالح.")
       setIsLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

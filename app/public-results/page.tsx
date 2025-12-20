@@ -31,10 +31,10 @@ export default function PublicResultsPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Generate years for the select dropdown (e.g., current year and past 5 years)
+    // Generate years for the select dropdown (e.g., current year and past 2 years)
     const currentYear = new Date().getFullYear()
     const hijriYear = currentYear - 578
-    const generatedYears = Array.from({ length: 5 }, (_, i) => hijriYear - i)
+    const generatedYears = Array.from({ length: 2 }, (_, i) => hijriYear - i)
     setYears(generatedYears)
     setSelectedYear(currentYear.toString()) // Set current year as default
 
@@ -66,7 +66,7 @@ export default function PublicResultsPage() {
       if (!studentCode || !selectedYear) {
         toast({
           title: "خطأ",
-          description: "الرجاء إدخال رمز الطالب واختيار السنة.",
+          description: "الرجاء إدخال كود الطالب واختيار السنة.",
           variant: "destructive",
         })
         return
@@ -124,11 +124,11 @@ export default function PublicResultsPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="studentCode">رمز الطالب</Label>
+              <Label htmlFor="studentCode">كود الطالب</Label>
               <Input
                 id="studentCode"
                 type="text"
-                placeholder="أدخل رمز الطالب"
+                placeholder="أدخل كود الطالب"
                 value={studentCode}
                 onChange={(e) => setStudentCode(e.target.value)}
                 required
@@ -179,7 +179,7 @@ export default function PublicResultsPage() {
                   <p className="font-medium">{result.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">الرمز:</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">الكود:</p>
                   <p className="font-medium">{result.code}</p>
                 </div>
                 <div>
@@ -189,10 +189,6 @@ export default function PublicResultsPage() {
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">النتيجة:</p>
                   <p className="font-medium">{result.result}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">المدينة:</p>
-                  <p className="font-medium">{result.city}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">السنة:</p>
