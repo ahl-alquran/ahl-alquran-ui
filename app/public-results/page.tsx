@@ -117,7 +117,7 @@ export default function PublicResultsPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">نتائج الطلاب</CardTitle>
         </CardHeader>
@@ -128,7 +128,7 @@ export default function PublicResultsPage() {
               <Input
                 id="studentCode"
                 type="text"
-                placeholder="أدخل كود الطالب"
+                placeholder="أدخل رمز الطالب"
                 value={studentCode}
                 onChange={(e) => setStudentCode(e.target.value)}
                 required
@@ -144,7 +144,7 @@ export default function PublicResultsPage() {
                 <SelectContent>
                   {years.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
-                        هـ {year}
+                      هـ {year}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -173,26 +173,22 @@ export default function PublicResultsPage() {
           {result && (
             <div className="mt-6 space-y-4">
               <h3 className="text-xl font-semibold text-center">تفاصيل النتيجة</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">الاسم:</p>
                   <p className="font-medium">{result.name}</p>
                 </div>
-                <div>
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">الكود:</p>
                   <p className="font-medium">{result.code}</p>
                 </div>
-                <div>
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">المستوى:</p>
                   <p className="font-medium">{result.level}</p>
                 </div>
-                <div>
+                <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">النتيجة:</p>
                   <p className="font-medium">{result.result}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">السنة:</p>
-                  <p className="font-medium">{result.year}</p>
                 </div>
               </div>
             </div>
