@@ -188,7 +188,7 @@ export default function PublicResultsPage() {
                 </div>
                 <div className="flex items-center justify-between border-b pb-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">النتيجة:</p>
-                  <p className="font-medium">{result.result}</p>
+                  <p className="font-medium">{result.result < 0 ? "لا توجد نتيجة" : result.result}</p>
                 </div>
               </div>
             </div>

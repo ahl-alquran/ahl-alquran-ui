@@ -377,7 +377,7 @@ export default function StudentDetailsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {history.result == null ? (
+                          {history.result < 0 ? (
                             <Button
                               size="sm"
                               variant="outline"

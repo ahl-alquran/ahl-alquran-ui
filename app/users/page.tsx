@@ -193,7 +193,7 @@ export default function UsersPage() {
                   <Label htmlFor="role">الدور</Label>
                   <Select
                     value={registerForm.role}
-                    onValueChange={(value: "ADMIN" | "USER") => setRegisterForm({ ...registerForm, role: value })}
+                    onValueChange={(value: "ADMIN" | "USER" | "TESTER") => setRegisterForm({ ...registerForm, role: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="اختر الدور" />
@@ -201,6 +201,7 @@ export default function UsersPage() {
                     <SelectContent>
                       <SelectItem value="ADMIN">مسؤول (ADMIN)</SelectItem>
                       <SelectItem value="USER">مستخدم (USER)</SelectItem>
+                      <SelectItem value="TESTER">مختبر (TESTER)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
