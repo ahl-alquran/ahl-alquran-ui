@@ -27,7 +27,7 @@ export default function DashboardPage() {
   const { toast } = useToast()
 
   const currentYear = new Date().getFullYear()
-  const hijriYear = currentYear - 578
+  const hijriYear = currentYear - 579
   const years = Array.from({ length: 5 }, (_, i) => hijriYear - i)
 
   useEffect(() => {

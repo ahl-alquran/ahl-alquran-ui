@@ -50,7 +50,7 @@ export default function TesterResultsPage() {
 
 useEffect(() => {
   const currentYear = new Date().getFullYear()
-  const hijriYear = currentYear - 578 // approximate Hijri year
+  const hijriYear = currentYear - 579 // approximate Hijri year
   setSelectedYear(hijriYear.toString())
 }, [])
 
