@@ -88,15 +88,17 @@ export default function StudentPrintPage() {
 
   return (
     <div className="min-h-screen bg-white" dir="rtl">
-      {/* Local style to ensure any global nav/header is hidden on this route just in case */}
-            <style jsx global>{`
+      <style jsx global>{`
         @media print {
-          /* Hide navigation, headers, and other UI elements */
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+          
           header, nav, .print\\:hidden { 
             display: none !important; 
           }
           
-          /* Hide reCAPTCHA elements */
           .grecaptcha-badge,
           iframe[src*="recaptcha"],
           div[class*="recaptcha"],
@@ -106,33 +108,38 @@ export default function StudentPrintPage() {
             visibility: hidden !important;
           }
           
-          /* Hide any floating elements that might interfere */
           div[style*="position: fixed"],
           div[style*="position: absolute"][style*="bottom"],
           div[style*="z-index"] {
             display: none !important;
           }
           
-          /* Ensure clean print layout */
           body {
             margin: 0 !important;
             padding: 0 !important;
           }
           
-          /* Remove shadows and borders for cleaner print */
           .shadow, .shadow-md, .shadow-lg {
+            box-shadow: none !important;
+          }
+          
+          .print-container {
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          
+          .print-card {
+            border: none !important;
             box-shadow: none !important;
           }
         }
         
-        /* Also hide during screen view for consistency */
         header, nav { 
           display: none !important; 
         }
       `}</style>
 
-      <main className="max-w-3xl mx-auto p-4 print:max-w-none">
-        {/* Controls (hidden in print) */}
+      <main className="max-w-3xl mx-auto p-4 print:max-w-none print:p-0 print-container">
         <div className="flex gap-2 justify-end mb-4 print:hidden">
           <Button variant="outline" onClick={() => router.push(`/students/${studentCode}`)}>
             <ArrowRight className="h-4 w-4 ml-2" />
@@ -144,90 +151,148 @@ export default function StudentPrintPage() {
           </Button>
         </div>
 
-        <Card className="shadow print:shadow-none">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">مسابقة أهل القرآن</CardTitle>
-            <p className="text-gray-600 mt-1">مسابقة أهل القرآن </p>
+        <Card className="shadow print:shadow-none print-card">
+          <CardHeader className="text-center pb-3 print:pb-2">
+            <CardTitle className="text-xl font-bold print:text-lg">مسابقة أهل القرآن</CardTitle>
+            <p className="text-gray-600 text-sm print:text-xs mt-0.5">مسابقة أهل القرآن</p>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 print:space-y-3">
             <section>
-              <h2 className="font-semibold text-lg mb-3">بيانات الطالب</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">الاسم</div>
-                  <div className="font-medium">{student.name}</div>
+              <h2 className="font-semibold text-base mb-2 print:text-sm print:mb-1.5">بيانات الطالب</h2>
+              <div className="grid grid-cols-2 gap-2 print:gap-1.5">
+                <div className="border rounded p-2 print:p-1.5">
+                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الاسم</div>
+                  <div className="font-medium text-sm print:text-xs">{student.name}</div>
                 </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">الكود</div>
-                  <div className="font-medium">{student.code}</div>
+                <div className="border rounded p-2 print:p-1.5">
+                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الكود</div>
+                  <div className="font-medium text-sm print:text-xs">{student.code}</div>
                 </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">المدينة</div>
-                  <div className="font-medium">{student.city}</div>
+                <div className="border rounded p-2 print:p-1.5">
+                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المدينة</div>
+                  <div className="font-medium text-sm print:text-xs">{student.city}</div>
                 </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">الرقم القومي</div>
-                  <div className="font-medium">{student.nationalId}</div>
+                <div className="border rounded p-2 print:p-1.5">
+                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الرقم القومي</div>
+                  <div className="font-medium text-sm print:text-xs">{student.nationalId}</div>
                 </div>
               </div>
             </section>
 
             <section>
-              <h2 className="font-semibold text-lg mb-3">بيانات الاختبار</h2>
+              <h2 className="font-semibold text-base mb-2 print:text-sm print:mb-1.5">بيانات الاختبار</h2>
               {firstHistory ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="border rounded p-3">
-                    <div className="text-xs text-gray-500 mb-1">المستوى</div>
-                    <div className="font-medium">{firstHistory.level}</div>
+                <div className="space-y-3 print:space-y-2">
+                  <div className="grid grid-cols-2 gap-2 print:gap-1.5">
+                    <div className="border rounded p-2 print:p-1.5">
+                      <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المستوى</div>
+                      <div className="font-medium text-sm print:text-xs">{firstHistory.level}</div>
+                    </div>
+                    <div className="border rounded p-2 print:p-1.5">
+                      <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">السنة</div>
+                      <div className="font-medium text-sm print:text-xs">{firstHistory.year}</div>
+                    </div>
                   </div>
-                  <div className="border rounded p-3">
-                    <div className="text-xs text-gray-500 mb-1">السنة</div>
-                    <div className="font-medium">{firstHistory.year}</div>
+
+                  {/* Scoring Table – EXACT match to provided image */}
+                  <div className="mt-2">
+                    <h3 className="font-semibold mb-1.5 text-sm print:text-xs print:mb-1">
+                      جدول الدرجات
+                    </h3>
+
+                    <table className="w-full border-2 border-black text-sm print:text-[11px]">
+                      <thead>
+                        <tr>
+                          <th className="border-2 border-black text-center py-1 w-1/6">
+                            السؤال
+                          </th>
+                          <th className="border-2 border-black text-center py-1 w-2/6">
+                            الدرجة
+                          </th>
+                          <th className="border-2 border-black text-center py-1 w-1/6">
+                            السؤال
+                          </th>
+                          <th className="border-2 border-black text-center py-1 w-2/6">
+                            الدرجة
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {[
+                          ["السؤال السادس", "السؤال الأول"],
+                          ["السؤال السابع", "السؤال الثاني"],
+                          ["السؤال الثامن", "السؤال الثالث"],
+                          ["السؤال التاسع", "السؤال الرابع"],
+                          ["السؤال العاشر", "السؤال الخامس"],
+                        ].map(([rightQ, leftQ], i) => (
+                          <tr key={i}>
+                            {/* Left block (6–10) */}
+                            <td className="border-2 border-black text-center py-1">{leftQ}</td>
+                            <td className="border-2 border-black text-center py-1">
+                              &nbsp;
+                        </td>
+
+                            {/* Right block (1–5) */}
+                            <td className="border-2 border-black text-center py-1">{rightQ}</td>
+                            <td className="border-2 border-black text-center py-1">
+                              &nbsp;
+                            </td>
+                          </tr>
+                        ))}
+
+                        {/* Total row */}
+                        <tr>
+                          <td
+                            colSpan={1}
+                            className="border-2 border-black text-center font-bold py-1"
+                          >
+                            المجموع الكلي
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="border rounded p-3">
-                    <div className="text-xs text-gray-500 mb-1">النتيجة</div>
-                    <div className="font-medium">---------------</div>
-                  </div>
+
                 </div>
               ) : (
-                <div className="text-gray-600">لا يوجد سجل امتحان لعرضه.</div>
+                <div className="text-gray-600 text-sm">لا يوجد سجل امتحان لعرضه.</div>
               )}
             </section>
 
-              <div className="border-b border-dashed pt-16">
-                </div>
+            <div className="border-b-2 border-dashed border-gray-400 pt-6 print:pt-4"></div>
 
             <section>
-              <h2 className="font-semibold text-lg mb-3">نسخة الطالب</h2>
+              <h2 className="font-semibold text-base mb-2 print:text-sm print:mb-1.5">نسخة الطالب</h2>
               {firstHistory ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">الاسم</div>
-                  <div className="font-medium">{student.name}</div>
+                <div className="grid grid-cols-2 gap-2 print:gap-1.5">
+                  <div className="border rounded p-2 print:p-1.5">
+                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الاسم</div>
+                    <div className="font-medium text-sm print:text-xs">{student.name}</div>
+                  </div>
+                  <div className="border rounded p-2 print:p-1.5">
+                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الكود</div>
+                    <div className="font-medium text-sm print:text-xs">{student.code}</div>
+                  </div>
+                  <div className="border rounded p-2 print:p-1.5">
+                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المستوى</div>
+                    <div className="font-medium text-sm print:text-xs">{firstHistory.level}</div>
+                  </div>
+                  <div className="border rounded p-2 print:p-1.5">
+                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المدينة</div>
+                    <div className="font-medium text-sm print:text-xs">{student.city}</div>
+                  </div>
+                  <div className="border rounded p-2 print:p-1.5">
+                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">التاريخ</div>
+                    <div className="font-medium text-sm print:text-xs">-</div>
+                  </div>
+                  <div className="border rounded p-2 print:p-1.5">
+                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">رقم المسلسل</div>
+                    <div className="font-medium text-sm print:text-xs">-</div>
+                  </div>
                 </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">الكود</div>
-                  <div className="font-medium">{student.code}</div>
-                </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">المستوى</div>
-                  <div className="font-medium">{firstHistory.level}</div>
-                </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">المدينة</div>
-                  <div className="font-medium">{student.city}</div>
-                </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">التاريخ</div>
-                  <div className="font-medium">-</div>
-                </div>
-                <div className="border rounded p-3">
-                  <div className="text-xs text-gray-500 mb-1">رقم المسلسل</div>
-                  <div className="font-medium">-</div>
-                </div>
-              </div>
               ) : (
-                <div className="text-gray-600">لا يوجد سجل امتحان لعرضه.</div>
+                <div className="text-gray-600 text-sm">لا يوجد سجل امتحان لعرضه.</div>
               )}
             </section>
           </CardContent>
