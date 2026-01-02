@@ -72,7 +72,7 @@ export default function StudentDetailsPage() {
 
   // Compute current Hijri-like year as used elsewhere in the project
   const currentYear = new Date().getFullYear()
-  const hijriYear = currentYear - 578
+  const hijriYear = currentYear - 579
 
   useEffect(() => {
     if (studentCode) {

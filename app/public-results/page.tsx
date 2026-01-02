@@ -33,7 +33,7 @@ export default function PublicResultsPage() {
   useEffect(() => {
     // Generate years for the select dropdown (e.g., current year and past 2 years)
     const currentYear = new Date().getFullYear()
-    const hijriYear = currentYear - 578
+    const hijriYear = currentYear - 579
     const generatedYears = Array.from({ length: 2 }, (_, i) => hijriYear - i)
     setYears(generatedYears)
     setSelectedYear(currentYear.toString()) // Set current year as default
