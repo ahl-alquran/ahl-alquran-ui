@@ -10,6 +10,10 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "أهل القرآن - نظام إدارة الطلاب",
   description: "نظام إدارة طلاب أهل القرآن",
+  // Fallback icon: use an image from `public/`. You can replace with `/favicon.ico`.
+  icons: {
+    icon: '/logo.png',
+  },
 }
 
 export default function RootLayout({

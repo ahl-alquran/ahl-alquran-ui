@@ -16,18 +16,18 @@ import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 
 export default function DashboardPage() {
+  const currentYear = new Date().getFullYear()
+  const hijriYear = currentYear - 579
   const [totalStudents, setTotalStudents] = useState<number>(0)
   const [studentsByYear, setStudentsByYear] = useState<number>(0)
   const [studentsByLevel, setStudentsByLevel] = useState<LevelStudentCount[]>([])
-  const [selectedYear, setSelectedYear] = useState<string>((new Date().getFullYear()- 578).toString())
+  const [selectedYear, setSelectedYear] = useState<string>(hijriYear.toString())
   const [isLoading, setIsLoading] = useState(true)
   const [isLevelsLoading, setIsLevelsLoading] = useState(true)
   const [downloadingLevel, setDownloadingLevel] = useState<string | null>(null) // State for individual level download loading
   const [isDownloadingAllStudents, setIsDownloadingAllStudents] = useState<boolean>(false) // New state for all students download loading
   const { toast } = useToast()
 
-  const currentYear = new Date().getFullYear()
-  const hijriYear = currentYear - 579
   const years = Array.from({ length: 5 }, (_, i) => hijriYear - i)
 
   useEffect(() => {

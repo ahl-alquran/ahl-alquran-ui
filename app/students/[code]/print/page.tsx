@@ -92,7 +92,7 @@ export default function StudentPrintPage() {
         @media print {
           @page {
             size: A4;
-            margin: 15mm;
+            margin: 5mm;
           }
           
           header, nav, .print\\:hidden { 
@@ -132,13 +132,63 @@ export default function StudentPrintPage() {
             border: none !important;
             box-shadow: none !important;
           }
+          
+          .print-header {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 8px 16px !important;
+          }
+          
+          .print-logo {
+            width: 77px !important;
+            height: 77px !important;
+          }
+          
+          .print-title {
+            font-size: 20px !important;
+            font-weight: bold !important;
+          }
+          
+          .print-subtitle {
+            font-size: 14px !important;
+          }
+          
+          .section-title {
+            font-size: 16px !important;
+            margin-bottom: 8px !important;
+          }
+          
+          .info-label {
+            font-size: 12px !important;
+          }
+          
+          .info-value {
+            font-size: 14px !important;
+          }
+          
+          .print-table {
+            font-size: 13px !important;
+          }
+          
+          .space-compact {
+            margin-top: 12px !important;
+            margin-bottom: 12px !important;
+          }
+          
+          .grid-compact {
+            gap: 8px !important;
+          }
+          
+          .border-item {
+            padding: 8px !important;
+          }
         }
         
         header, nav { 
           display: none !important; 
         }
       `}</style>
-
       <main className="max-w-3xl mx-auto p-4 print:max-w-none print:p-0 print-container">
         <div className="flex gap-2 justify-end mb-4 print:hidden">
           <Button variant="outline" onClick={() => router.push(`/students/${studentCode}`)}>
@@ -152,55 +202,58 @@ export default function StudentPrintPage() {
         </div>
 
         <Card className="shadow print:shadow-none print-card">
-          <CardHeader className="text-center pb-3 print:pb-2">
-            <CardTitle className="text-xl font-bold print:text-lg">مسابقة أهل القرآن</CardTitle>
-            <p className="text-gray-600 text-sm print:text-xs mt-0.5">مسابقة أهل القرآن</p>
+          <CardHeader className="text-center pb-3 print:pb-2 print-header">
+            <img src="/logo.png" alt="Logo" className="hidden print:block print-logo" />
+            <div className="flex-1">
+              <CardTitle className="text-xl font-bold print-title">مسابقة أهل القرآن</CardTitle>
+              <p className="text-gray-500 text-base print-subtitle mt-0.5">أهل القرآن</p>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4 print:space-y-3">
             <section>
-              <h2 className="font-semibold text-base mb-2 print:text-sm print:mb-1.5">بيانات الطالب</h2>
+              <h2 className="font-semibold text-xl mb-2 print:mb-1.5">بيانات الطالب</h2>
               <div className="grid grid-cols-2 gap-2 print:gap-1.5">
                 <div className="border rounded p-2 print:p-1.5">
-                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الاسم</div>
-                  <div className="font-medium text-sm print:text-xs">{student.name}</div>
+                  <div className="text-lg text-gray-500 mb-0.5 ">الاسم</div>
+                  <div className=" text-xl ">{student.name}</div>
                 </div>
                 <div className="border rounded p-2 print:p-1.5">
-                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الكود</div>
-                  <div className="font-medium text-sm print:text-xs">{student.code}</div>
+                  <div className="text-lg text-gray-500 mb-0.5 ">الكود</div>
+                  <div className=" text-xl ">{student.code}</div>
                 </div>
                 <div className="border rounded p-2 print:p-1.5">
-                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المدينة</div>
-                  <div className="font-medium text-sm print:text-xs">{student.city}</div>
+                  <div className="text-lg text-gray-500 mb-0.5 ">المدينة</div>
+                  <div className="text-xl ">{student.city}</div>
                 </div>
                 <div className="border rounded p-2 print:p-1.5">
-                  <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الرقم القومي</div>
-                  <div className="font-medium text-sm print:text-xs">{student.nationalId}</div>
+                  <div className="text-lg text-gray-500 mb-0.5 ">الرقم القومي</div>
+                  <div className="text-xl ">{student.nationalId}</div>
                 </div>
               </div>
             </section>
 
             <section>
-              <h2 className="font-semibold text-base mb-2 print:text-sm print:mb-1.5">بيانات الاختبار</h2>
+              <h2 className="font-semibold text-xl mb-2 print:mb-1.5">بيانات الاختبار</h2>
               {firstHistory ? (
                 <div className="space-y-3 print:space-y-2">
                   <div className="grid grid-cols-2 gap-2 print:gap-1.5">
                     <div className="border rounded p-2 print:p-1.5">
-                      <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المستوى</div>
-                      <div className="font-medium text-sm print:text-xs">{firstHistory.level}</div>
+                      <div className="text-lg text-gray-500 mb-0.5 ">المستوى</div>
+                      <div className="text-xl ">{firstHistory.level}</div>
                     </div>
                     <div className="border rounded p-2 print:p-1.5">
-                      <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">السنة</div>
-                      <div className="font-medium text-sm print:text-xs">{firstHistory.year}</div>
+                      <div className="text-lg text-gray-500 mb-0.5 ">السنة</div>
+                      <div className="text-xl ">{firstHistory.year}</div>
                     </div>
                   </div>
 
                   {/* Scoring Table – EXACT match to provided image */}
                   <div className="mt-2">
-                    <h3 className="font-semibold mb-1.5 text-sm print:text-xs print:mb-1">
+                    <h3 className="font-semibold mb-1.5 text-xl print:mb-1">
                       جدول الدرجات
                     </h3>
 
-                    <table className="w-full border-2 border-black text-sm print:text-[11px]">
+                    <table className="w-full border-2 border-black text-sm ">
                       <thead>
                         <tr>
                           <th className="border-2 border-black text-center py-1 w-1/6">
@@ -231,7 +284,7 @@ export default function StudentPrintPage() {
                             <td className="border-2 border-black text-center py-1">{leftQ}</td>
                             <td className="border-2 border-black text-center py-1">
                               &nbsp;
-                        </td>
+                            </td>
 
                             {/* Right block (1–5) */}
                             <td className="border-2 border-black text-center py-1">{rightQ}</td>
@@ -260,39 +313,39 @@ export default function StudentPrintPage() {
               )}
             </section>
 
-            <div className="border-b-2 border-dashed border-gray-400 pt-6 print:pt-4"></div>
+            <div className="border-b-2 border-dashed border-gray-400 pt-6 print:mt-5"></div>
 
             <section>
-              <h2 className="font-semibold text-base mb-2 print:text-sm print:mb-1.5">نسخة الطالب</h2>
+              <h2 className="font-semibold text-xl mb-2 print:mb-1.5 print:mt-10">نسخة الطالب</h2>
               {firstHistory ? (
                 <div className="grid grid-cols-2 gap-2 print:gap-1.5">
                   <div className="border rounded p-2 print:p-1.5">
-                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الاسم</div>
-                    <div className="font-medium text-sm print:text-xs">{student.name}</div>
+                    <div className="text-lg text-gray-500 mb-0.5">الاسم</div>
+                    <div className="text-xl">{student.name}</div>
                   </div>
                   <div className="border rounded p-2 print:p-1.5">
-                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">الكود</div>
-                    <div className="font-medium text-sm print:text-xs">{student.code}</div>
+                    <div className="text-lg text-gray-500 mb-0.5">الكود</div>
+                    <div className=" text-xl">{student.code}</div>
                   </div>
                   <div className="border rounded p-2 print:p-1.5">
-                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المستوى</div>
-                    <div className="font-medium text-sm print:text-xs">{firstHistory.level}</div>
+                    <div className="text-lg text-gray-500 mb-0.5 ">المستوى</div>
+                    <div className=" text-xl ">{firstHistory.level}</div>
                   </div>
                   <div className="border rounded p-2 print:p-1.5">
-                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">المدينة</div>
-                    <div className="font-medium text-sm print:text-xs">{student.city}</div>
+                    <div className="text-lg text-gray-500 mb-0.5 ">المدينة</div>
+                    <div className=" text-xl">{student.city}</div>
                   </div>
                   <div className="border rounded p-2 print:p-1.5">
-                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">التاريخ</div>
-                    <div className="font-medium text-sm print:text-xs">-</div>
+                    <div className="text-lg text-gray-500 mb-0.5 ">التاريخ</div>
+                    <div className=" text-xl ">-</div>
                   </div>
                   <div className="border rounded p-2 print:p-1.5">
-                    <div className="text-xs text-gray-500 mb-0.5 print:text-[10px]">رقم المسلسل</div>
-                    <div className="font-medium text-sm print:text-xs">-</div>
+                    <div className="text-lg text-gray-500 mb-0.5 ">رقم المسلسل</div>
+                    <div className=" text-xl ">-</div>
                   </div>
                 </div>
               ) : (
-                <div className="text-gray-600 text-sm">لا يوجد سجل امتحان لعرضه.</div>
+                <div className="text-gray-600 text-xl">لا يوجد سجل امتحان لعرضه.</div>
               )}
             </section>
           </CardContent>
