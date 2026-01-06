@@ -213,19 +213,19 @@ export default function StudentPrintPage() {
             <section>
               <h2 className="font-semibold text-xl mb-2 print:mb-1.5">بيانات الطالب</h2>
               <div className="grid grid-cols-2 gap-2 print:gap-1.5">
-                <div className="border rounded p-2 print:p-1.5">
+                <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                   <div className="text-lg text-gray-500 mb-0.5 ">الاسم</div>
                   <div className=" text-xl ">{student.name}</div>
                 </div>
-                <div className="border rounded p-2 print:p-1.5">
+                <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                   <div className="text-lg text-gray-500 mb-0.5 ">الكود</div>
                   <div className=" text-xl ">{student.code}</div>
                 </div>
-                <div className="border rounded p-2 print:p-1.5">
+                <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                   <div className="text-lg text-gray-500 mb-0.5 ">المدينة</div>
                   <div className="text-xl ">{student.city}</div>
                 </div>
-                <div className="border rounded p-2 print:p-1.5">
+                <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                   <div className="text-lg text-gray-500 mb-0.5 ">الرقم القومي</div>
                   <div className="text-xl ">{student.nationalId}</div>
                 </div>
@@ -237,11 +237,11 @@ export default function StudentPrintPage() {
               {firstHistory ? (
                 <div className="space-y-3 print:space-y-2">
                   <div className="grid grid-cols-2 gap-2 print:gap-1.5">
-                    <div className="border rounded p-2 print:p-1.5">
+                    <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                       <div className="text-lg text-gray-500 mb-0.5 ">المستوى</div>
                       <div className="text-xl ">{firstHistory.level}</div>
                     </div>
-                    <div className="border rounded p-2 print:p-1.5">
+                    <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                       <div className="text-lg text-gray-500 mb-0.5 ">السنة</div>
                       <div className="text-xl ">{firstHistory.year}</div>
                     </div>
@@ -319,27 +319,27 @@ export default function StudentPrintPage() {
               <h2 className="font-semibold text-xl mb-2 print:mb-1.5 print:mt-10">نسخة الطالب</h2>
               {firstHistory ? (
                 <div className="grid grid-cols-2 gap-2 print:gap-1.5">
-                  <div className="border rounded p-2 print:p-1.5">
+                  <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                     <div className="text-lg text-gray-500 mb-0.5">الاسم</div>
                     <div className="text-xl">{student.name}</div>
                   </div>
-                  <div className="border rounded p-2 print:p-1.5">
+                  <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                     <div className="text-lg text-gray-500 mb-0.5">الكود</div>
                     <div className=" text-xl">{student.code}</div>
                   </div>
-                  <div className="border rounded p-2 print:p-1.5">
+                  <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                     <div className="text-lg text-gray-500 mb-0.5 ">المستوى</div>
                     <div className=" text-xl ">{firstHistory.level}</div>
                   </div>
-                  <div className="border rounded p-2 print:p-1.5">
+                  <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                     <div className="text-lg text-gray-500 mb-0.5 ">المدينة</div>
                     <div className=" text-xl">{student.city}</div>
                   </div>
-                  <div className="border rounded p-2 print:p-1.5">
+                  <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                     <div className="text-lg text-gray-500 mb-0.5 ">التاريخ</div>
                     <div className=" text-xl ">-</div>
                   </div>
-                  <div className="border rounded p-2 print:p-1.5">
+                  <div className="border rounded p-2 print:p-1.5 print:border-gray-700">
                     <div className="text-lg text-gray-500 mb-0.5 ">رقم المسلسل</div>
                     <div className=" text-xl ">-</div>
                   </div>
