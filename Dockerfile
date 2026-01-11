@@ -3,7 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --force
 COPY . .
-RUN npm run build
+
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 
 FROM node:22-alpine
 WORKDIR /app

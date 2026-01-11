@@ -29,6 +29,6 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /opt/myapp
+            cd /opt/ahl-quran
             docker compose pull frontend
             docker compose up -d frontend
