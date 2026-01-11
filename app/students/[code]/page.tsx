@@ -36,6 +36,7 @@ import {
   registerStudentExam,
 } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/components/auth-provider"
 import { Loader2, Edit, Trash2, Plus } from "lucide-react"
 import { useCities } from "@/hooks/use-cities"
 import { useLevels } from "@/hooks/use-levels"
@@ -53,6 +54,9 @@ export default function StudentDetailsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
+
+  const { user } = useAuth()
+  const isAdmin = user?.authorities?.includes("ADMIN")
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -293,36 +297,38 @@ export default function StudentDetailsPage() {
               <Edit className="h-4 w-4 mr-2" />
               تعديل
             </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent w-full sm:w-auto"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  حذف
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="mx-4 sm:mx-auto">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    هل أنت متأكد من حذف الطالب "{studentDetails.name}"؟ لا يمكن التراجع عن هذا الإجراء.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                  <AlertDialogCancel className="w-full sm:w-auto">إلغاء</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDelete}
-                    className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
-                    disabled={isDeleting}
+            {isAdmin && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent w-full sm:w-auto"
                   >
-                    {isDeleting ? "جاري الحذف..." : "حذف"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    حذف
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="mx-4 sm:mx-auto">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      هل أنت متأكد من حذف الطالب "{studentDetails.name}"؟ لا يمكن التراجع عن هذا الإجراء.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                    <AlertDialogCancel className="w-full sm:w-auto">إلغاء</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? "جاري الحذف..." : "حذف"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </div>
 
