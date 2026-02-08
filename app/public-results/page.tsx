@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { fetchPublicStudentResult, type PublicStudentResult } from "@/lib/api"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
@@ -22,22 +21,13 @@ declare global {
 
 export default function PublicResultsPage() {
   const [studentCode, setStudentCode] = useState("")
-  const [selectedYear, setSelectedYear] = useState<string | undefined>(undefined)
   const [result, setResult] = useState<PublicStudentResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [years, setYears] = useState<number[]>([])
   const [recaptchaReady, setRecaptchaReady] = useState(false) // New state for reCAPTCHA readiness
   const { toast } = useToast()
 
   useEffect(() => {
-    // Generate years for the select dropdown (e.g., current year and past 2 years)
-    const currentYear = new Date().getFullYear()
-    const hijriYear = currentYear - 579
-    const generatedYears = Array.from({ length: 2 }, (_, i) => hijriYear - i)
-    setYears(generatedYears)
-    setSelectedYear(currentYear.toString()) // Set current year as default
-
     // Wait for reCAPTCHA to be ready
     if (typeof window.grecaptcha.enterprise !== "undefined" && window.grecaptcha.enterprise.ready) {
       window.grecaptcha.enterprise.ready(() => {
@@ -63,10 +53,10 @@ export default function PublicResultsPage() {
       setError(null)
       setResult(null)
 
-      if (!studentCode || !selectedYear) {
+      if (!studentCode) {
         toast({
           title: "خطأ",
-          description: "الرجاء إدخال كود الطالب واختيار السنة.",
+          description: "الرجاء إدخال كود الطالب.",
           variant: "destructive",
         })
         return
@@ -74,6 +64,10 @@ export default function PublicResultsPage() {
 
       setLoading(true)
       try {
+        // Calculate current Hijri year
+        const currentYear = new Date().getFullYear()
+        const hijriYear = currentYear - 579
+
         // reCAPTCHA readiness is now handled by the recaptchaReady state and button disabled prop
         const recaptchaResponse = await window.grecaptcha.enterprise.execute(config.recaptchaSiteKey, {
           // Use config.recaptchaSiteKey
@@ -82,7 +76,7 @@ export default function PublicResultsPage() {
 
         const studentResult = await fetchPublicStudentResult(
           studentCode,
-          Number.parseInt(selectedYear),
+          hijriYear,
           recaptchaResponse,
         )
 
@@ -93,10 +87,10 @@ export default function PublicResultsPage() {
             description: "تم جلب النتائج بنجاح.",
           })
         } else {
-          setError("لم يتم العثور على نتائج لهذا الطالب في السنة المحددة.")
+          setError("لم يتم العثور على نتائج لهذا الطالب.")
           toast({
             title: "لا توجد نتائج",
-            description: "لم يتم العثور على نتائج لهذا الطالب في السنة المحددة.",
+            description: "لم يتم العثور على نتائج لهذا الطالب.",
             variant: "default",
           })
         }
@@ -112,7 +106,7 @@ export default function PublicResultsPage() {
         setLoading(false)
       }
     },
-    [studentCode, selectedYear, toast],
+    [studentCode, toast],
   )
 
   return (
@@ -134,21 +128,6 @@ export default function PublicResultsPage() {
                 required
                 disabled={loading}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="year">السنة</Label>
-              <Select value={selectedYear} onValueChange={setSelectedYear} disabled={loading}>
-                <SelectTrigger id="year">
-                  <SelectValue placeholder="اختر السنة" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      هـ {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
             <Button type="submit" className="w-full" disabled={loading || !recaptchaReady}>
               {loading ? (
